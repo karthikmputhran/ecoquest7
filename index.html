@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Games Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --green-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 15px 35px rgba(0, 0, 0, 0.2);
+            --shadow-heavy: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 226, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Page transitions */
+        .login-container, .game-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(100vh);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .login-container.active, .game-page.active {
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .dashboard {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+        }
+
+        .dashboard.active {
+            display: block;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Login Page */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 48px;
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-heavy);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .login-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .password-requirements {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            border-left: 3px solid #4facfe;
+            backdrop-filter: blur(10px);
+            line-height: 1.5;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(79, 172, 254, 0.4);
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Dashboard Header */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 24px 32px;
+            border-radius: 20px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-light);
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: var(--danger-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        .game-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .ecosort-card { --gradient: var(--green-gradient); }
+        .quiz-card { --gradient: var(--warning-gradient); }
+        .tycoon-card { --gradient: var(--success-gradient); }
+        .power-card { --gradient: var(--primary-gradient); }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            text-align: center;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .game-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: -0.01em;
+        }
+
+        .game-description {
+            font-size: 1rem;
+            opacity: 0.85;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Game Pages */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .game-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .back-btn {
+            background: var(--glass-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* Game Stats */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #4facfe;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-heavy);
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal-content p {
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-buttons button {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-buttons button.confirm {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .modal-buttons button.cancel {
+            background: var(--danger-gradient);
+            color: white;
+        }
+
+        .modal-buttons button:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            right: 24px;
+            bottom: 24px;
+        }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-top: 12px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--green-gradient);
+        }
+
+        .toast.error {
+            background: var(--danger-gradient);
+        }
+
+        /* EcoSort Game Specific */
+        .ecosort-game {
+            background: var(--green-gradient);
+        }
+
+        .ecosort-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+            min-height: 120px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .waste-item {
+            background: var(--success-gradient);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: grab;
+            user-select: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .waste-item:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .waste-item:active {
+            cursor: grabbing;
+        }
+
+        .bins-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .bin {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            color: white;
+            border: 3px dashed var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .bin:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .bin.drag-over {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+            transform: scale(1.05);
+        }
+
+        .bin-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .bin-label {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .bin-description {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-gradient);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn.primary {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn:not(.primary) {
+            background: var(--glass-bg);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-heavy);
+            z-index: 1000;
+        }
+
+        /* Quiz Game */
+        .quiz-game {
+            background: var(--warning-gradient);
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-heavy);
+            color: #333;
+        }
+
+        .quiz-container h2 {
+            color: #333;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+        }
+
+        .option {
+            display: block;
+            padding: 16px 20px;
+            margin: 12px 0;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-1px);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Tycoon Game */
+        .tycoon-game {
+            background: radial-gradient(800px 600px at 10% 20%, rgba(124,252,0,0.06), transparent), 
+                        linear-gradient(180deg, #0f172a, #063b2e);
+            align-items: flex-start;
+        }
+
+        .tycoon-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .tycoon-sidebar {
+            background: var(--glass-bg);
+            padding: 24px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            height: fit-content;
+        }
+
+        .tycoon-main {
+            padding: 24px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            min-height: 600px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .stat .small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .stat .big {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #4facfe;
+        }
+
+        .tycoon-btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: none;
+            background: var(--green-gradient);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .tycoon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .tycoon-forest {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .tree-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tree-emoji {
+            font-size: 2rem;
+        }
+
+        /* Power Builder Game */
+        .power-builder-game {
+            background: linear-gradient(180deg, #071427, #0a2030);
+            align-items: flex-start;
+        }
+
+        .power-builder-game .wrap {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--glass-bg);
+            padding: 24px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .power-builder-game header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .power-builder-game h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .power-builder-game .game {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        .power-builder-game .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .power-builder-game .cell {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .power-builder-game .cell:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .power-builder-game .cell.city {
+            background: var(--success-gradient);
+            color: #fff;
+        }
+
+        .power-builder-game .cell.shade { /* Added style for natural shade */
+            background: rgba(30, 80, 50, 0.8);
+            color: #fff;
+            border: 1px solid rgba(168, 224, 99, 0.5);
+        }
+
+        .power-builder-game .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .power-builder-game .panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .power-builder-game .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .power-builder-game .item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .power-builder-game .item:active {
+            cursor: grabbing;
+        }
+
+        .power-builder-game .icon {
+            font-size: 1.5rem;
+        }
+
+        .power-builder-game progress {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .power-builder-game .log {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .power-builder-game .log div {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .tycoon-wrap {
+                grid-template-columns: 1fr;
+            }
+            
+            .power-builder-game .game {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .bins-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+
+            .login-card {
+                padding: 32px;
+                margin: 16px;
+            }
+
+            .power-builder-game .cell {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Additional Game-Specific Animations */
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContent" class="dashboard"> 
+        <div class="container">
+            <header class="header">
+                <div class="logo">🌱 Eco-Games Hub</div>
+                <button class="logout-btn" onclick="showModal('logout')">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </header>
+            <div class="games-grid">
+                <div class="game-card ecosort-card" onclick="showGame('ecosort')">
+                    <div class="game-icon">♻️</div>
+                    <div class="game-title">EcoSort Challenge</div>
+                    <div class="game-description">Save the planet one piece of trash at a time! Sort waste correctly in this fast-paced environmental puzzle game.</div>
+                    <button class="play-btn">
+                        <i class="fas fa-play"></i> Start Sorting
+                    </button>
+                </div>
+                <div class="game-card quiz-card" onclick="showGame('quiz')">
+                    <div class="game-icon">🧠</div>
+                    <div class="game-title">Eco-Quiz Challenge</div>
+                    <div class="game-description">Test your environmental knowledge and learn fascinating facts about sustainability and conservation!</div>
+                    <button class="play-btn">
+                        <i class="fas fa-brain"></i> Test Knowledge
+                    </button>
+                </div>
+                <div class="game-card tycoon-card" onclick="showGame('tycoon')">
+                    <div class="game-icon">🌳</div>
+                    <div class="game-title">Tree Planting Tycoon</div>
+                    <div class="game-description">Build your green empire! Plant trees, expand your forest, and become an environmental tycoon.</div>
+                    <button class="play-btn">
+                        <i class="fas fa-seedling"></i> Start Planting
+                    </button>
+                </div>
+                <div class="game-card power-card" onclick="showGame('power-builder')">
+                    <div class="game-icon">⚡</div>
+                    <div class="game-title">Renewable Power Builder</div>
+                    <div class="game-description">Design sustainable cities! Build solar panels, wind turbines, and create a 100% renewable energy grid.</div>
+                    <button class="play-btn">
+                        <i class="fas fa-bolt"></i> Generate Power
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="loginPage" class="login-container active">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🌱 Eco-Games Hub</h1>
+                <p>Welcome, eco-warrior! Join the green revolution.</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your secure password" required>
+                    <div class="password-requirements">
+                        Password must be at least 8 characters long for security.
+                    </div>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-rocket"></i> Launch Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="ecosort-game" class="game-page ecosort-game"></div>
+    <div id="quiz-game" class="game-page quiz-game"></div>
+    <div id="tycoon-game" class="game-page tycoon-game"></div>
+    <div id="power-builder-game" class="game-page power-builder-game"></div>
+
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Core Application Logic
+        let currentGame = null;
+
+        const showModal = (type, message = '') => {
+            const modal = document.getElementById('customModal');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const buttonsEl = document.getElementById('modalButtons');
+
+            titleEl.textContent = 'Confirmation';
+            messageEl.textContent = message;
+            buttonsEl.innerHTML = '';
+            
+            if (type === 'logout') {
+                titleEl.textContent = 'Logout Confirmation';
+                messageEl.textContent = 'Are you sure you want to log out and return to the login screen?';
+                const confirmBtn = document.createElement('button');
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Yes, Logout';
+                confirmBtn.className = 'confirm';
+                confirmBtn.onclick = () => {
+                    hideModal();
+                    logout();
+                };
+                const cancelBtn = document.createElement('button');
+                cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+                cancelBtn.className = 'cancel';
+                cancelBtn.onclick = hideModal;
+                buttonsEl.appendChild(confirmBtn);
+                buttonsEl.appendChild(cancelBtn);
+            } else {
+                titleEl.textContent = 'Alert';
+                messageEl.textContent = message;
+                const okBtn = document.createElement('button');
+                okBtn.innerHTML = '<i class="fas fa-check"></i> OK';
+                okBtn.className = 'confirm';
+                okBtn.onclick = hideModal;
+                buttonsEl.appendChild(okBtn);
+            }
+
+            modal.style.display = 'flex';
+        };
+
+        const hideModal = () => {
+            document.getElementById('customModal').style.display = 'none';
+        };
+
+        const showToast = (msg, type) => {
+            const container = document.getElementById('toastContainer');
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast ${type}`;
+            toastEl.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${msg}`;
+            container.appendChild(toastEl);
+            
+            setTimeout(() => { toastEl.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+                setTimeout(() => toastEl.remove(), 500);
+            }, 4000);
+        };
+        
+        const showGame = (gameName) => {
+            document.getElementById('mainContent').classList.remove('active');
+            document.getElementById('loginPage').classList.remove('active');
+            const gamePage = document.getElementById(`${gameName}-game`);
+            gamePage.classList.add('active');
+            
+            switch(gameName) {
+                case 'ecosort': loadEcoSortGame(); break;
+                case 'quiz': loadQuizGame(); break;
+                case 'tycoon': loadTycoonGame(); break;
+                case 'power-builder': loadPowerBuilderGame(); break;
+            }
+            currentGame = gameName;
+        };
+
+        const goBackToDashboard = () => {
+            if (currentGame) {
+                document.getElementById(`${currentGame}-game`).classList.remove('active');
+            }
+            document.getElementById('mainContent').classList.add('active');
+            currentGame = null;
+        };
+
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email) {
+                showModal('alert', 'Please enter your email address.');
+                return;
+            }
+            
+            if (password.length >= 8) {
+                document.getElementById('loginPage').classList.remove('active');
+                document.getElementById('mainContent').classList.add('active');
+                showToast('Welcome to Eco-Games Hub! Ready to save the planet?', 'success');
+            } else {
+                showModal('alert', 'Password must be at least 8 characters long for security.');
+            }
+        });
+        
+        const logout = () => {
+            document.getElementById('mainContent').classList.remove('active');
+            if (currentGame) {
+                document.getElementById(`${currentGame}-game`).classList.remove('active');
+                currentGame = null;
+            }
+            document.getElementById('loginPage').classList.add('active');
+            document.getElementById('loginForm').reset();
+            showToast('Successfully logged out. See you next time!', 'success');
+        };
+
+        // EcoSort Challenge Game
+        const loadEcoSortGame = () => {
+            const container = document.getElementById('ecosort-game');
+            container.innerHTML = `
+                <div class="container">
+                    <div class="game-header slide-in-left">
+                        <h2><i class="fas fa-recycle"></i> EcoSort Challenge</h2>
+                        <button class="back-btn" onclick="goBackToDashboard()">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </div>
+                    <div class="game-stats slide-in-right">
+                        <div class="stat-card">
+                            <span class="stat-number" id="score">0</span>
+                            <span class="stat-label">Score</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="level">1</span>
+                            <span class="stat-label">Level</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="streak">0</span>
+                            <span class="stat-label">Streak</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="timer">60</span>
+                            <span class="stat-label">Time Left</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress"></div>
+                    </div>
+                    <div class="items-container ecosort-items-container" id="itemsContainer">
+                        <p style="color: rgba(255,255,255,0.7); font-style: italic; text-align: center; font-size: 1.1rem;">
+                            <i class="fas fa-play-circle"></i> Click "Start Game" to begin your eco-sorting adventure!
+                        </p>
+                    </div>
+                    <div class="bins-container">
+                        <div class="bin" data-type="organic">
+                            <div class="bin-icon">🥬</div>
+                            <div class="bin-label">Organic Waste</div>
+                            <div class="bin-description">Food scraps, garden waste, biodegradable materials</div>
+                        </div>
+                        <div class="bin" data-type="recyclable">
+                            <div class="bin-icon">♻️</div>
+                            <div class="bin-label">Recyclables</div>
+                            <div class="bin-description">Plastic bottles, paper, glass, aluminum cans</div>
+                        </div>
+                        <div class="bin" data-type="hazardous">
+                            <div class="bin-icon">⚠️</div>
+                            <div class="bin-label">Hazardous</div>
+                            <div class="bin-description">Batteries, chemicals, electronics, paint</div>
+                        </div>
+                        <div class="bin" data-type="general">
+                            <div class="bin-icon">🗑️</div>
+                            <div class="bin-label">General Waste</div>
+                            <div class="bin-description">Non-recyclable items, mixed materials</div>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn primary" id="ecosortStartBtn">
+                            <i class="fas fa-play"></i> Start Game
+                        </button>
+                        <button class="btn" id="ecosortResetBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="btn" id="ecosortPauseBtn">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                    </div>
+                    <div class="level-complete" id="levelComplete" style="display:none;">
+                        <h2 style="font-size:2.5em;margin-bottom:20px;">🎉 Level Complete!</h2>
+                        <p style="font-size:1.2em;margin-bottom:30px;">Excellent sorting! Ready for the next environmental challenge?</p>
+                        <button class="btn primary" id="ecosortNextLevelBtn">
+                            <i class="fas fa-arrow-right"></i> Next Level
+                        </button>
+                    </div>
+                </div>
+            `;
+            // Corrected initialization flow for EcoSort
+            const game = new WasteSortGame();
+            game.initBins(); // Initialize bins before setting up event listeners
+            // Event listeners are set after the game is instantiated and elements are in the DOM
+            document.getElementById('ecosortStartBtn').onclick = () => game.startGame();
+            document.getElementById('ecosortResetBtn').onclick = () => game.resetGame();
+            document.getElementById('ecosortPauseBtn').onclick = () => game.pauseGame();
+            document.getElementById('ecosortNextLevelBtn').onclick = () => game.nextLevel();
+            // The initial state display is handled by the constructor and updateUI in startGame/resetState
+        };
+
+        class WasteSortGame {
+            constructor() {
+                this.score = 0;
+                this.level = 1;
+                this.streak = 0;
+                this.timeLeft = 60;
+                this.gameActive = false;
+                this.paused = false;
+                this.itemsCompleted = 0;
+                this.totalItems = 5;
+                this.timer = null;
+                this.currentItems = [];
+                this.draggedItem = null;
+                this.wasteItems = {
+                    organic: [
+                        '🍌 Banana Peel', '🍎 Apple Core', '🥕 Carrot Scraps', '☕ Coffee Grounds', 
+                        '🍞 Bread Crumbs', '🥔 Potato Peels', '🍊 Orange Rinds', '🥒 Cucumber Ends'
+                    ],
+                    recyclable: [
+                        '🍼 Plastic Bottle', '📰 Newspaper', '🥤 Aluminum Can', '📦 Cardboard Box', 
+                        '🍷 Glass Bottle', '📄 Office Paper', '🥛 Milk Carton', '📱 Phone Box'
+                    ],
+                    hazardous: [
+                        '🔋 Old Battery', '🧴 Paint Container', '💡 LED Bulb', '🧽 Chemical Cleaner', 
+                        '💊 Medicine Bottle', '🔌 Electronics', '⚡ Power Adapter', '🧪 Lab Chemical'
+                    ],
+                    general: [
+                        '🍟 Food Wrapper', '🧻 Used Tissue', '🚬 Cigarette Butt', '🍭 Candy Wrapper', 
+                        '🧸 Broken Toy', '👟 Worn Shoe', '🧦 Old Sock', '💄 Makeup Tube'
+                    ]
+                };
+            }
+
+            initBins() {
+                document.querySelectorAll('.bin').forEach(bin => {
+                    bin.addEventListener('dragover', e => e.preventDefault());
+                    bin.addEventListener('drop', e => this.handleDrop(e, bin));
+                    bin.addEventListener('dragenter', e => {
+                        e.preventDefault();
+                        if (this.gameActive && !this.paused) bin.classList.add('drag-over');
+                    });
+                    bin.addEventListener('dragleave', e => {
+                        // Check if the related target is outside the bin (a true exit)
+                        if (e.relatedTarget && !bin.contains(e.relatedTarget)) {
+                            bin.classList.remove('drag-over');
+                        } else if (!e.relatedTarget) {
+                            // Fix for issue where relatedTarget is null on some browsers/events
+                            bin.classList.remove('drag-over');
+                        }
+                    });
+                    // This event is needed to ensure the drag-over class is removed when leaving the container.
+                    bin.addEventListener('drop', () => bin.classList.remove('drag-over')); 
+                });
+            }
+
+            startGame() {
+                if (this.gameActive && !this.paused) return;
+                this.resetState(true); // True to reset score/level
+                this.gameActive = true;
+                this.paused = false;
+                this.timeLeft = 60 + (this.level - 1) * 15;
+                this.generateItems();
+                this.startTimer();
+                document.getElementById('ecosortPauseBtn').innerHTML = '<i class="fas fa-pause"></i> Pause';
+                this.updateUI();
+                showToast(`Level ${this.level} started! Sort ${this.totalItems} items correctly.`, 'success');
+            }
+
+            resetState(fullReset = false) {
+                clearInterval(this.timer);
+                if (fullReset) {
+                    this.score = 0;
+                    this.level = 1;
+                    this.totalItems = 5;
+                }
+                this.streak = 0;
+                this.itemsCompleted = 0;
+                this.draggedItem = null;
+                document.getElementById('levelComplete').style.display = 'none';
+                this.currentItems = [];
+                // Clear items container
+                const container = document.getElementById('itemsContainer');
+                if (container) container.innerHTML = '<p style="color: rgba(255,255,255,0.7); font-style: italic; text-align: center; font-size: 1.1rem;">Click "Start Game" to begin your eco-sorting adventure!</p>';
+                this.updateUI();
+            }
+
+            pauseGame() {
+                if (!this.gameActive) return;
+                this.paused = !this.paused;
+                const pauseBtn = document.getElementById('ecosortPauseBtn');
+                if (this.paused) {
+                    pauseBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                    clearInterval(this.timer);
+                    showToast('Game paused', 'success');
+                } else {
+                    pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    this.startTimer();
+                    showToast('Game resumed', 'success');
+                }
+            }
+
+            resetGame() {
+                this.resetState(true); // Full reset
+                this.gameActive = false; // Stop before restart
+                this.updateUI();
+                showToast('Game has been reset. Click Start Game to begin.', 'error');
+            }
+
+            generateItems() {
+                const container = document.getElementById('itemsContainer');
+                container.innerHTML = '';
+                this.currentItems = [];
+                const categories = Object.keys(this.wasteItems);
+
+                for (let i = 0; i < this.totalItems; i++) {
+                    const cat = categories[Math.floor(Math.random() * categories.length)];
+                    const items = this.wasteItems[cat];
+                    const itemText = items[Math.floor(Math.random() * items.length)];
+                    const el = document.createElement('div');
+                    
+                    el.className = 'waste-item';
+                    el.draggable = true;
+                    el.textContent = itemText;
+                    el.dataset.type = cat;
+                    el.dataset.id = Date.now() + i;
+                    
+                    el.addEventListener('dragstart', e => {
+                        if (!this.gameActive || this.paused) {
+                            e.preventDefault();
+                            return;
+                        }
+                        this.draggedItem = {
+                            id: el.dataset.id,
+                            type: el.dataset.type,
+                            element: el
+                        };
+                        // Set dataTransfer for compatibility, though actual data isn't used
+                        e.dataTransfer.setData('text/plain', el.dataset.id); 
+                        e.dataTransfer.effectAllowed = 'move';
+                        el.style.opacity = 0.6;
+                        el.style.transform = 'rotate(5deg)';
+                    });
+                    
+                    el.addEventListener('dragend', () => {
+                        el.style.opacity = 1;
+                        el.style.transform = 'rotate(0deg)';
+                        this.draggedItem = null; // Clear dragged item on drag end
+                    });
+                    
+                    container.appendChild(el);
+                    this.currentItems.push({
+                        id: el.dataset.id,
+                        type: cat,
+                        element: el
+                    });
+                }
+                this.updateProgress();
+            }
+
+            handleDrop(e, bin) {
+                e.preventDefault();
+                bin.classList.remove('drag-over');
+                
+                // Get the ID from dataTransfer for cross-browser reliability, falling back to this.draggedItem
+                const itemId = e.dataTransfer.getData('text/plain') || (this.draggedItem ? this.draggedItem.id : null); 
+
+                const droppedItem = this.currentItems.find(i => i.id == itemId);
+
+                if (!this.gameActive || this.paused || !droppedItem) {
+                    return;
+                }
+                
+                this.processItem(droppedItem.type, bin.dataset.type, droppedItem.id, bin);
+            }
+
+            processItem(itemType, binType, itemId, bin) {
+                const correct = itemType === binType;
+                const itemIndex = this.currentItems.findIndex(i => i.id == itemId);
+                
+                if (itemIndex === -1) return;
+                
+                const item = this.currentItems[itemIndex];
+                
+                if (correct) {
+                    const pointsGained = (10 + this.streak * 3) * this.level;
+                    this.score += pointsGained;
+                    this.streak++;
+                    showToast(`Correct! +${pointsGained} points`, 'success');
+                    
+                    // Fade out and remove the item
+                    item.element.style.animation = 'fadeOut 0.5s ease-out forwards'; // Use forwards to keep the final state
+                    setTimeout(() => {
+                        if (item.element && item.element.parentNode) {
+                            item.element.remove();
+                        }
+                    }, 500);
+                    
+                    this.currentItems.splice(itemIndex, 1);
+                    this.itemsCompleted++;
+                } else {
+                    this.score = Math.max(0, this.score - 5);
+                    this.streak = 0;
+                    const correctBin = {
+                        'organic': 'Organic Waste',
+                        'recyclable': 'Recyclables',
+                        'hazardous': 'Hazardous',
+                        'general': 'General Waste'
+                    }[itemType];
+                    showToast(`Wrong bin! Should go in: ${correctBin}`, 'error');
+                    
+                    // Shake animation for incorrect drop
+                    item.element.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        item.element.style.animation = '';
+                    }, 500);
+                }
+                
+                this.updateUI();
+                this.updateProgress();
+                
+                if (this.itemsCompleted >= this.totalItems) {
+                    setTimeout(() => this.levelComplete(), 800);
+                }
+            }
+
+            startTimer() {
+                clearInterval(this.timer);
+                this.timer = setInterval(() => {
+                    if (!this.paused && this.gameActive) {
+                        this.timeLeft--;
+                        this.updateUI();
+                        
+                        if (this.timeLeft <= 0) {
+                            this.gameOver();
+                        }
+                    }
+                }, 1000);
+            }
+
+            updateUI() {
+                const scoreEl = document.getElementById('score');
+                if (scoreEl) scoreEl.textContent = this.score.toLocaleString();
+                
+                const levelEl = document.getElementById('level');
+                if (levelEl) levelEl.textContent = this.level;
+                
+                const streakEl = document.getElementById('streak');
+                if (streakEl) streakEl.textContent = this.streak;
+                
+                const timerEl = document.getElementById('timer');
+                if (timerEl) {
+                    timerEl.textContent = Math.max(0, this.timeLeft);
+                    timerEl.style.color = this.timeLeft <= 10 && this.timeLeft > 0 ? '#ff6b6b' : '#4facfe';
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.itemsCompleted / this.totalItems) * 100;
+                const progressEl = document.getElementById('progress');
+                if (progressEl) progressEl.style.width = progress + '%';
+            }
+
+            levelComplete() {
+                this.gameActive = false;
+                clearInterval(this.timer);
+                
+                const bonusPoints = this.timeLeft * 2;
+                this.score += bonusPoints;
+                
+                document.getElementById('levelComplete').style.display = 'flex';
+                showToast(`Level complete! Bonus: ${bonusPoints} points`, 'success');
+            }
+
+            nextLevel() {
+                this.level++;
+                this.totalItems = Math.min(15, 5 + this.level * 2); // Slightly increased max items for difficulty
+                this.itemsCompleted = 0;
+                document.getElementById('levelComplete').style.display = 'none';
+                this.startGame();
+            }
+
+            gameOver() {
+                this.gameActive = false;
+                clearInterval(this.timer);
+                showToast(`Time's up! Final Score: ${this.score.toLocaleString()} points`, 'error');
+                
+                setTimeout(() => {
+                    showModal('alert', `Game Over! You reached level ${this.level} with ${this.score.toLocaleString()} points. Great job sorting for the environment!`);
+                }, 1000);
+            }
+        }
+
+        // Add shake animation for wrong answers
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+
+        // Quiz Game
+        const loadQuizGame = () => {
+            const container = document.getElementById('quiz-game');
+            container.innerHTML = `
+                <div class="quiz-container">
+                    <div class="game-header">
+                        <h2><i class="fas fa-brain"></i> Eco-Quiz Challenge</h2>
+                        <button class="back-btn" onclick="goBackToDashboard()" style="background: #333; color: white;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    <div id="quizStats" style="display: flex; justify-content: space-between; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                        <div>Score: <strong id="quizScore">0</strong></div>
+                        <div>Question: <strong id="questionNumber">1</strong>/5</div>
+                        <div>Streak: <strong id="quizStreak">0</strong></div>
+                    </div>
+                    <h3 id="question" style="color: #333; margin-bottom: 20px; font-size: 1.4rem; line-height: 1.4;"></h3>
+                    <div id="options"></div>
+                    <button onclick="submitQuizAnswer()" style="width: 100%; padding: 16px; background: var(--success-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; margin-top: 20px; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="fas fa-check"></i> Submit Answer
+                    </button>
+                    <div class="feedback" id="quiz-feedback"></div>
+                </div>
+            `;
+            
+            const quizData = [
+                {
+                    question: "Which gas is primarily responsible for global warming and climate change?",
+                    options: ["Oxygen (O2)", "Carbon Dioxide (CO2)", "Nitrogen (N2)", "Hydrogen (H2)"],
+                    answer: "Carbon Dioxide (CO2)",
+                    explanation: "CO2 traps heat in Earth's atmosphere, contributing significantly to global warming."
+                },
+                {
+                    question: "What is the most abundant renewable energy source on Earth?",
+                    options: ["Wind Energy", "Solar Energy", "Hydroelectric Power", "Geothermal Energy"],
+                    answer: "Solar Energy",
+                    explanation: "The sun provides more energy to Earth in one hour than humans use in a year."
+                },
+                {
+                    question: "Which practice is most effective for water conservation at home?",
+                    options: ["Taking longer showers", "Rainwater harvesting", "Leaving taps running", "Watering gardens at noon"],
+                    answer: "Rainwater harvesting",
+                    explanation: "Collecting rainwater reduces demand on municipal water systems and is free!"
+                },
+                {
+                    question: "What does the '3 Rs' environmental principle stand for?",
+                    options: ["Read, Write, Recite", "Reduce, Reuse, Recycle", "Run, Rest, Recover", "Research, Report, Review"],
+                    answer: "Reduce, Reuse, Recycle",
+                    explanation: "This waste hierarchy helps minimize environmental impact by prioritizing waste reduction."
+                },
+                {
+                    question: "Which forest is known as the 'lungs of the Earth'?",
+                    options: ["Black Forest", "Amazon Rainforest", "Redwood Forest", "Boreal Forest"],
+                    answer: "Amazon Rainforest",
+                    explanation: "The Amazon produces about 20% of the world's oxygen and absorbs massive amounts of CO2."
+                },
+                {
+                    question: "What percentage of Earth's water is fresh water suitable for drinking?",
+                    options: ["50%", "25%", "10%", "Less than 3%"],
+                    answer: "Less than 3%",
+                    explanation: "Only about 2.5% of Earth's water is fresh, and much of that is frozen in glaciers."
+                },
+                {
+                    question: "Which transportation method produces the least CO2 emissions per person?",
+                    options: ["Car", "Airplane", "Bus", "Bicycle"],
+                    answer: "Bicycle",
+                    explanation: "Bicycles produce zero direct emissions and are the most environmentally friendly transport."
+                },
+                {
+                    question: "What is the main cause of ocean acidification?",
+                    options: ["Plastic pollution", "Oil spills", "CO2 absorption", "Overfishing"],
+                    answer: "CO2 absorption",
+                    explanation: "Oceans absorb about 30% of atmospheric CO2, forming carbonic acid and lowering pH."
+                }
+            ];
+            
+            let currentQuestion;
+            let questionIndex = 0;
+            let quizScore = 0;
+            let quizStreak = 0;
+            let usedQuestions = [];
+
+            window.submitQuizAnswer = function() {
+                const selected = document.querySelector('input[name="option"]:checked');
+                const feedback = document.getElementById("quiz-feedback");
+                
+                if (!selected) {
+                    feedback.innerHTML = '<i class="fas fa-hand-point-up"></i> Please select an option before submitting!';
+                    feedback.className = "feedback wrong";
+                    return;
+                }
+
+                // Disable submit button temporarily
+                document.querySelector('button[onclick="submitQuizAnswer()"]').disabled = true;
+
+                const answer = selected.value;
+                const isCorrect = answer === currentQuestion.answer;
+                
+                if (isCorrect) {
+                    const points = 10 + (quizStreak * 2);
+                    quizScore += points;
+                    quizStreak++;
+                    feedback.innerHTML = `<i class="fas fa-check-circle"></i> Correct! +${points} points<br><small>${currentQuestion.explanation}</small>`;
+                    feedback.className = "feedback correct show";
+                } else {
+                    quizStreak = 0;
+                    feedback.innerHTML = `<i class="fas fa-times-circle"></i> Wrong! The correct answer was: <strong>${currentQuestion.answer}</strong><br><small>${currentQuestion.explanation}</small>`;
+                    feedback.className = "feedback wrong show";
+                }
+                
+                // Update stats
+                document.getElementById('quizScore').textContent = quizScore;
+                document.getElementById('quizStreak').textContent = quizStreak;
+                
+                // Disable options and highlight result
+                document.querySelectorAll('input[name="option"]').forEach(input => {
+                    input.disabled = true;
+                    const label = input.parentElement;
+                    if (input.value === currentQuestion.answer) {
+                        label.style.background = '#d4edda';
+                        label.style.borderColor = '#28a745';
+                    } else if (input.checked) {
+                        label.style.background = '#f8d7da';
+                        label.style.borderColor = '#dc3545';
+                    }
+                });
+                
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                    questionIndex++;
+                    if (questionIndex < 5) {
+                        loadQuestion();
+                    } else {
+                        showQuizComplete();
+                    }
+                    // Re-enable submit button
+                    document.querySelector('button[onclick="submitQuizAnswer()"]').disabled = false;
+                }, 3000);
+            };
+
+            const loadQuestion = () => {
+                const availableQuestions = quizData.filter(q => !usedQuestions.includes(q));
+                
+                if (availableQuestions.length === 0) {
+                    // Reset used questions if all are used
+                    usedQuestions = [];
+                }
+                
+                // Select a question from the currently available set (which might be the full set if reset)
+                const currentSet = quizData.filter(q => !usedQuestions.includes(q));
+                currentQuestion = currentSet[Math.floor(Math.random() * currentSet.length)];
+                
+                usedQuestions.push(currentQuestion);
+                
+                document.getElementById("question").textContent = currentQuestion.question;
+                document.getElementById("questionNumber").textContent = questionIndex + 1;
+                
+                const optionsDiv = document.getElementById("options");
+                optionsDiv.innerHTML = "";
+                
+                // Shuffle options for better replayability
+                const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+
+                shuffledOptions.forEach((opt) => {
+                    const label = document.createElement("label");
+                    label.classList.add("option");
+                    label.innerHTML = `
+                        <input type="radio" name="option" value="${opt}"> 
+                        <span><i class="fas fa-circle" style="margin-right: 8px; font-size: 0.8em;"></i>${opt}</span>
+                    `;
+                    optionsDiv.appendChild(label);
+                });
+                
+                document.getElementById("quiz-feedback").textContent = "";
+                document.getElementById("quiz-feedback").className = "feedback";
+            };
+
+            const showQuizComplete = () => {
+                const maxPossibleScore = 90; // (10+12+14+16+18)
+                const percentage = Math.min(100, Math.round((quizScore / maxPossibleScore) * 100));
+                let message, rating;
+                
+                if (percentage >= 80) {
+                    rating = "Eco Expert!";
+                    message = "Outstanding! You're a true environmental champion!";
+                } else if (percentage >= 60) {
+                    rating = "Green Warrior";
+                    message = "Great job! You know your environmental facts!";
+                } else if (percentage >= 40) {
+                    rating = "Eco Learner";
+                    message = "Good effort! Keep learning about our planet!";
+                } else {
+                    rating = "Getting Started";
+                    message = "Every expert started somewhere. Keep exploring!";
+                }
+                
+                document.getElementById('quiz-game').innerHTML = `
+                    <div class="quiz-container" style="text-align: center;">
+                        <h2 style="color: #333; margin-bottom: 30px;">Quiz Complete!</h2>
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🏆</div>
+                        <h3 style="color: #333; margin-bottom: 15px;">${rating}</h3>
+                        <p style="color: #666; margin-bottom: 20px; font-size: 1.1rem;">${message}</p>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #28a745; margin-bottom: 10px;">${quizScore} Points</div>
+                            <div style="color: #666;">Final Score (${percentage}% proficiency)</div>
+                        </div>
+                        <button onclick="loadQuizGame()" style="padding: 16px 32px; background: var(--success-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; margin: 10px; cursor: pointer;">
+                            <i class="fas fa-redo"></i> Play Again
+                        </button>
+                        <button onclick="goBackToDashboard()" style="padding: 16px 32px; background: #6c757d; color: white; border: none; border-radius: 12px; font-weight: 700; margin: 10px; cursor: pointer;">
+                            <i class="fas fa-home"></i> Back to Hub
+                        </button>
+                    </div>
+                `;
+                
+                showToast(`Quiz complete! You scored ${quizScore} points!`, 'success');
+            };
+
+            // Initialize
+            questionIndex = 0;
+            quizScore = 0;
+            quizStreak = 0;
+            usedQuestions = [];
+            loadQuestion();
+        };
+
+        // Tycoon Game
+        const loadTycoonGame = () => {
+            const container = document.getElementById('tycoon-game');
+            container.innerHTML = `
+                <div class="tycoon-wrap">
+                    <div class="game-header" style="grid-column: 1 / -1;">
+                        <h2><i class="fas fa-tree"></i> Tree Planting Tycoon</h2>
+                        <button class="back-btn" onclick="goBackToDashboard()">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </div>
+                    <aside class="tycoon-sidebar">
+                        <div class="stat">
+                            <div>
+                                <h3><i class="fas fa-coins"></i> Coins</h3>
+                                <p class="small">Environmental currency</p>
+                            </div>
+                            <div class="big" id="coins">0</div>
+                        </div>
+                        <div class="stat">
+                            <div>
+                                <h3><i class="fas fa-seedling"></i> Trees</h3>
+                                <p class="small">Total planted</p>
+                            </div>
+                            <div class="big" id="trees">0</div>
+                        </div>
+                        <div class="stat">
+                            <div>
+                                <h3><i class="fas fa-mouse-pointer"></i> Per Click</h3>
+                                <p class="small">Coins earned per tree</p>
+                            </div>
+                            <div class="big" id="cpc">1</div>
+                        </div>
+                        <div class="stat">
+                            <div>
+                                <h3><i class="fas fa-robot"></i> Auto Planters</h3>
+                                <p class="small">Trees planted per second</p>
+                            </div>
+                            <div class="big" id="autoCount">0</div>
+                        </div>
+                        <div class="controls" style="margin-top: 20px;">
+                            <button class="tycoon-btn" id="plantBtn">
+                                <i class="fas fa-seedling"></i> Plant a Tree
+                            </button>
+                            <button class="tycoon-btn" id="buyAuto" style="background: var(--primary-gradient);">
+                                <i class="fas fa-robot"></i> Buy Auto Planter (100)
+                            </button>
+                            <button class="tycoon-btn" id="upgradeClick" style="background: var(--warning-gradient);">
+                                <i class="fas fa-arrow-up"></i> Upgrade Click (50)
+                            </button>
+                        </div>
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-leaf"></i> Environmental Impact</h4>
+                            <p style="font-size: 0.9rem; opacity: 0.8;">Your trees have absorbed <strong id="co2Absorbed">0</strong> tons of CO2!</p>
+                        </div>
+                    </aside>
+                    <main class="tycoon-main">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2><i class="fas fa-tree"></i> Your Forest Grove</h2>
+                            <div style="text-align: right;">
+                                <div class="small">Forest Health</div>
+                                <div style="width: 200px; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 5px;">
+                                    <div id="forestHealthBar" style="width: 100%; height: 100%; background: var(--green-gradient); border-radius: 4px; transition: width 0.3s ease;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tycoon-forest" id="forest">
+                            <div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                                <i class="fas fa-seedling" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                                <p>Your forest will grow here as you plant trees!</p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+
+            const defaultState = {
+                coins: 20,
+                trees: 0,
+                cpc: 1,
+                autoPlanters: 0,
+                clickUpgrades: 0,
+                lastTick: Date.now()
+            };
+            let state = { ...defaultState };
+
+            const coinsEl = document.getElementById('coins');
+            const treesEl = document.getElementById('trees');
+            const cpcEl = document.getElementById('cpc');
+            const autoCountEl = document.getElementById('autoCount');
+            const forestEl = document.getElementById('forest');
+            const co2El = document.getElementById('co2Absorbed');
+            const buyAutoBtn = document.getElementById('buyAuto');
+            const upgradeClickBtn = document.getElementById('upgradeClick');
+
+            const plantTree = () => {
+                // Planting a tree is free, but you earn coins for the action
+                state.coins += state.cpc;
+                state.trees++;
+                updateUI();
+                addTreeCard({ emoji: randomTreeEmoji() });
+                
+                // Show coin gain effect
+                showToast(`+${state.cpc} coins from planting!`, 'success');
+            };
+
+            const addTreeCard = (data) => {
+                // Remove placeholder if it exists
+                const placeholder = forestEl.querySelector('div[style*="grid-column: 1/-1"]');
+                if (placeholder) {
+                    placeholder.remove();
+                }
+
+                const treeCard = document.createElement('div');
+                treeCard.className = "tree-card";
+                treeCard.innerHTML = `<div class="tree-emoji">${data.emoji}</div>`;
+                // Add a small animation for new tree growth
+                treeCard.style.animation = 'treeGrow 0.5s ease-out';
+                forestEl.prepend(treeCard);
+
+                // Limit display to prevent performance issues
+                if (forestEl.children.length > 50) {
+                    forestEl.removeChild(forestEl.lastChild);
+                }
+            };
+            
+            // Add a simple growth animation style
+            const treeGrowStyle = document.createElement('style');
+            treeGrowStyle.textContent = `@keyframes treeGrow { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }`;
+            document.head.appendChild(treeGrowStyle);
+
+            const updateUI = () => {
+                coinsEl.textContent = Math.floor(state.coins).toLocaleString();
+                treesEl.textContent = Math.floor(state.trees).toLocaleString();
+                cpcEl.textContent = state.cpc;
+                autoCountEl.textContent = state.autoPlanters;
+                // CO2 absorption: assume 0.05 tons/tree as a simple factor
+                co2El.textContent = (state.trees * 0.05).toFixed(1);
+
+                // Update button costs
+                const autoCost = 100 * Math.pow(1.5, state.autoPlanters);
+                const clickCost = 50 * Math.pow(2, state.clickUpgrades);
+                
+                buyAutoBtn.innerHTML = `<i class="fas fa-robot"></i> Buy Auto Planter (${Math.floor(autoCost).toLocaleString()})`;
+                upgradeClickBtn.innerHTML = `<i class="fas fa-arrow-up"></i> Upgrade Click (${Math.floor(clickCost).toLocaleString()})`;
+                
+                // Disable buttons if can't afford
+                buyAutoBtn.disabled = state.coins < autoCost;
+                upgradeClickBtn.disabled = state.coins < clickCost;
+                
+                buyAutoBtn.style.opacity = state.coins < autoCost ? '0.5' : '1';
+                upgradeClickBtn.style.opacity = state.coins < clickCost ? '0.5' : '1';
+                
+                // Update forest health bar (always 100% in this simple version)
+                document.getElementById('forestHealthBar').style.width = '100%';
+            };
+
+            const randomTreeEmoji = () => {
+                const trees = ["🌱", "🌿", "🌳", "🌲", "🌴", "🎋", "🎍"];
+                return trees[Math.floor(Math.random() * trees.length)];
+            };
+
+            // Event listeners
+            document.getElementById('plantBtn').onclick = plantTree;
+            
+            buyAutoBtn.onclick = () => {
+                const cost = 100 * Math.pow(1.5, state.autoPlanters);
+                if (state.coins >= cost) {
+                    state.coins -= cost;
+                    state.autoPlanters++;
+                    showToast("Auto planter purchased! Trees will grow automatically.", "success");
+                } else {
+                    showToast("Not enough coins for auto planter.", "error");
+                }
+                updateUI();
+            };
+            
+            upgradeClickBtn.onclick = () => {
+                const cost = 50 * Math.pow(2, state.clickUpgrades);
+                if (state.coins >= cost) {
+                    state.coins -= cost;
+                    state.clickUpgrades++;
+                    state.cpc = 1 + state.clickUpgrades;
+                    showToast(`Click power upgraded! Now earning ${state.cpc} coins per click.`, "success");
+                } else {
+                    showToast("Not enough coins for upgrade.", "error");
+                }
+                updateUI();
+            };
+
+            // Auto planter logic
+            let autoInterval = setInterval(() => {
+                const now = Date.now();
+                // Check time passed since last tick (more accurate than fixed interval math)
+                const dt = (now - state.lastTick) / 1000; 
+                state.lastTick = now;
+                
+                if (state.autoPlanters > 0) {
+                    const treesToAdd = state.autoPlanters * dt;
+                    state.coins += treesToAdd;
+                    state.trees += treesToAdd;
+                    
+                    // Only visually add a tree card if it's a full tree planted 
+                    // and not too frequent to spam the UI
+                    if (Math.floor(state.trees) > Math.floor(state.trees - treesToAdd)) {
+                        if (Math.random() < 0.2) { // Random chance to show a new tree
+                            addTreeCard({ emoji: randomTreeEmoji() });
+                        }
+                    }
+                    
+                    updateUI();
+                }
+            }, 1000); // Check and update every second
+
+            // Ensure the interval is cleared when leaving the game
+            container.addEventListener('DOMNodeRemoved', (e) => {
+                if(e.target === container) {
+                    clearInterval(autoInterval);
+                }
+            });
+
+            updateUI();
+            showToast('Welcome to Tree Planting Tycoon! Start building your forest empire.', 'success');
+        };
+
+        // Power Builder Game
+        const loadPowerBuilderGame = () => {
+            const container = document.getElementById('power-builder-game');
+            container.innerHTML = `
+                <div class="wrap">
+                    <header>
+                        <h1><i class="fas fa-bolt"></i> Renewable Power Builder</h1>
+                        <button class="back-btn" onclick="goBackToDashboard()" style="position: absolute; top: 20px; right: 20px;">
+                            <i class="fas fa-arrow-left"></i> Back to Hub
+                        </button>
+                    </header>
+                    <div class="game">
+                        <div class="left">
+                            <div class="grid" id="grid" aria-label="Build grid"></div>
+                        </div>
+                        <div class="sidebar">
+                            <div class="panel palette"> <h3 style="margin-bottom: 15px;"><i class="fas fa-tools"></i> Building Tools</h3>
+                                <div class="small" style="margin-bottom: 15px;">Drag items onto the grid to build your renewable energy city!</div>
+                                <div class="item" draggable="true" data-type="solar" data-icon="☀️">
+                                    <div class="icon">☀️</div>
+                                    <div>Solar Panel<br><small>+5 energy, less effective in shade</small></div>
+                                </div>
+                                <div class="item" draggable="true" data-type="wind" data-icon="🌬️">
+                                    <div class="icon">🌬️</div>
+                                    <div>Wind Turbine<br><small>+8 energy, less effective near cities</small></div>
+                                </div>
+                                <div class="item" draggable="true" data-type="factory" data-icon="🏭">
+                                    <div class="icon">🏭</div>
+                                    <div>Factory<br><small>Blocks wind flow</small></div>
+                                </div>
+                                <div class="item" draggable="true" data-type="tree" data-icon="🌳">
+                                    <div class="icon">🌳</div>
+                                    <div>Tree<br><small>Creates shade for solar panels</small></div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <h4 style="margin-bottom: 10px;"><i class="fas fa-chart-bar"></i> Energy Statistics</h4>
+                                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                    <span>Solar Power:</span>
+                                    <span style="color: #ffd700; font-weight: bold;" id="solarEnergy">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                    <span>Wind Power:</span>
+                                    <span style="color: #87ceeb; font-weight: bold;" id="windEnergy">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                                    <span>Total Energy:</span>
+                                    <span style="color: #4facfe; font-weight: bold;" id="totalEnergy">0</span>
+                                </div>
+                                <div style="margin-top: 15px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>City Renewable %:</span>
+                                        <span style="color: #4facfe; font-weight: bold;" id="pct">0%</span>
+                                    </div>
+                                    <progress id="progress" value="0" max="100" style="width: 100%; height: 12px;"></progress>
+                                </div>
+                                <div style="margin-top: 15px;">
+                                    <div>XP Earned: <strong style="color: #4facfe;" id="xp">0</strong></div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="btn" id="reset" style="flex: 1;">
+                                        <i class="fas fa-undo"></i> Reset Grid
+                                    </button>
+                                    <button class="btn" id="autoFill" style="flex: 1; background: var(--success-gradient);">
+                                        <i class="fas fa-magic"></i> Demo Fill
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <h4 style="margin-bottom: 10px;"><i class="fas fa-list"></i> Activity Log</h4>
+                                <div class="log" id="log" style="max-height: 150px; overflow-y: auto; font-size: 0.85rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const cols = 10, rows = 6;
+            const gridEl = document.getElementById('grid');
+            const xpEl = document.getElementById('xp');
+            const pctEl = document.getElementById('pct');
+            const solarEl = document.getElementById('solarEnergy');
+            const windEl = document.getElementById('windEnergy');
+            const totalEl = document.getElementById('totalEnergy');
+            const progress = document.getElementById('progress');
+            const logEl = document.getElementById('log');
+            
+            const cells = [];
+            let placements = {}; // Store { "r-c": "type" }
+            const cityCells = new Set(); // Store { "r-c" } for city
+            const shadeCells = new Set(); // Store { "r-c" } for natural shade
+            
+            const buildGrid = () => {
+                gridEl.innerHTML = '';
+                cells.length = 0;
+                cityCells.clear();
+                shadeCells.clear();
+                placements = {};
+                
+                // Add some preset city areas
+                cityCells.add("1-1");
+                cityCells.add("2-1");
+                cityCells.add("1-2");
+                cityCells.add("2-2");
+                
+                // Add some natural shade areas
+                for (let i = 0; i < 8; i++) {
+                    const r = Math.floor(Math.random() * rows);
+                    const c = Math.floor(Math.random() * cols);
+                    const key = r + "-" + c;
+                    if (!cityCells.has(key)) {
+                        shadeCells.add(key);
+                    }
+                }
+                
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const div = document.createElement('div');
+                        div.className = 'cell';
+                        div.dataset.r = r;
+                        div.dataset.c = c;
+                        
+                        const key = r + "-" + c;
+                        if (cityCells.has(key)) {
+                            div.classList.add('city');
+                            div.innerHTML = '<div style="pointer-events: none;">🏙️</div>';
+                        } else if (shadeCells.has(key)) {
+                            div.classList.add('shade');
+                            div.innerHTML = '<div style="pointer-events: none;">🌳</div>'; // Initial natural feature icon
+                        }
+                        
+                        gridEl.appendChild(div);
+                        cells.push(div);
+                        
+                        div.addEventListener('dragover', e => {
+                            e.preventDefault();
+                            if (!cityCells.has(key)) div.classList.add('over');
+                        });
+                        div.addEventListener('dragleave', () => {
+                            div.classList.remove('over');
+                        });
+                        div.addEventListener('drop', e => {
+                            e.preventDefault();
+                            div.classList.remove('over');
+                            handleDrop(e, div);
+                        });
+                        // Allow right-click to remove an item
+                        div.addEventListener('contextmenu', e => {
+                            e.preventDefault();
+                            if (placements[key]) {
+                                delete placements[key];
+                                cell.innerHTML = shadeCells.has(key) ? '<div style="pointer-events: none;">🌳</div>' : '';
+                                cell.classList.remove('solar', 'wind', 'factory', 'tree');
+                                log(`Removed item from (${r}, ${c})`);
+                                recomputeEnergy();
+                            }
+                        });
+                    }
+                }
+                recomputeEnergy();
+                log('Grid initialized with cities and natural features');
+            };
+
+            // Make items draggable (corrected to target items now in the DOM)
+            document.querySelectorAll('.palette .item').forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    const type = item.dataset.type;
+                    const icon = item.dataset.icon;
+                    e.dataTransfer.setData('text/plain', type);
+                    e.dataTransfer.setData('icon', icon); // Pass icon for easier drop
+                    item.style.opacity = '0.5';
+                });
+                item.addEventListener('dragend', (e) => {
+                    item.style.opacity = '1';
+                });
+            });
+
+            const handleDrop = (e, cell) => {
+                const type = e.dataTransfer.getData('text/plain');
+                const icon = e.dataTransfer.getData('icon') || (type === 'solar' ? '☀️' : type === 'wind' ? '🌬️' : type === 'factory' ? '🏭' : type === 'tree' ? '🌳' : '?');
+                const r = parseInt(cell.dataset.r);
+                const c = parseInt(cell.dataset.c);
+                const key = r + "-" + c;
+                
+                // Don't allow building on cities
+                if (cityCells.has(key)) {
+                    log('Cannot build on city areas!');
+                    showToast('Cannot build on city areas!', 'error');
+                    return;
+                }
+                
+                // Remove existing item class/icon
+                cell.className = 'cell';
+                if (cityCells.has(key)) cell.classList.add('city');
+                if (shadeCells.has(key)) cell.classList.add('shade');
+
+                placements[key] = type;
+                
+                cell.classList.add(type);
+                cell.innerHTML = `<div style="pointer-events: none; font-size: 1.2em;">${icon}</div>`;
+                
+                log(`Placed ${type} at position (${r}, ${c})`);
+                recomputeEnergy();
+            };
+
+            const recomputeEnergy = () => {
+                let solar = 0, wind = 0;
+                
+                for (const [key, type] of Object.entries(placements)) {
+                    const [r, c] = key.split('-').map(Number);
+                    
+                    if (type === 'solar') {
+                        let base = 5;
+                        // Check for natural shade OR a placed tree OR a placed factory/building (assume factory blocks sun too)
+                        const hasShade = shadeCells.has(key) || 
+                                        Object.entries(placements).some(([pos, t]) => (t === 'tree' || t === 'factory') && isAdjacent(key, pos));
+                        if (hasShade) base *= 0.5; // Stronger penalty for shade
+                        solar += base;
+                    }
+                    
+                    if (type === 'wind') {
+                        let base = 8;
+                        // Wind: Less efficient near cities (1 block radius) or factories (adjacent only)
+                        const nearCity = isNearCity(r, c);
+                        const nearFactory = Object.entries(placements).some(([pos, t]) => t === 'factory' && isAdjacent(key, pos));
+                        
+                        if (nearCity) base *= 0.5; // Wind turbulence from city buildings
+                        if (nearFactory) base *= 0.1; // Factory drastically blocks wind
+                        
+                        wind += base;
+                    }
+                }
+                
+                const totalEnergy = solar + wind;
+                const cityConsumption = cityCells.size * 25; // Define base city energy demand
+                const maxPossibleEnergy = cityConsumption * 2; // Arbitrary high value for 100% benchmark
+                const xp = Math.round(totalEnergy);
+                // Calculate percentage based on city consumption
+                const percent = Math.min(100, Math.round((totalEnergy / cityConsumption) * 100));
+
+                solarEl.textContent = Math.round(solar);
+                windEl.textContent = Math.round(wind);
+                totalEl.textContent = xp;
+                xpEl.textContent = xp;
+                pctEl.textContent = percent + '%';
+                progress.value = percent;
+                
+                // Visual feedback for milestones
+                if (percent >= 100 && !window.milestone100) {
+                    showToast('Amazing! You achieved 100% renewable energy!', 'success');
+                    window.milestone100 = true;
+                } else if (percent >= 75 && !window.milestone75) {
+                    showToast('Great progress! 75% renewable energy achieved!', 'success');
+                    window.milestone75 = true;
+                } else if (percent >= 50 && !window.milestone50) {
+                    showToast('Halfway there! 50% renewable energy!', 'success');
+                    window.milestone50 = true;
+                }
+            };
+            
+            // Checks for any city in the 3x3 block centered at (r,c)
+            const isNearCity = (r, c) => {
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue; // Skip the cell itself
+                        const nr = r + dr;
+                        const nc = c + dc;
+                        if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) continue;
+                        if (cityCells.has(nr + "-" + nc)) return true;
+                    }
+                }
+                return false;
+            };
+            
+            // Checks for adjacency (3x3 block, including itself)
+            const isAdjacent = (pos1, pos2) => {
+                const [r1, c1] = pos1.split('-').map(Number);
+                const [r2, c2] = pos2.split('-').map(Number);
+                return Math.abs(r1 - r2) <= 1 && Math.abs(c1 - c2) <= 1;
+            };
+            
+            const log = (msg) => {
+                const p = document.createElement('div');
+                p.style.cssText = 'padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem;';
+                p.textContent = new Date().toLocaleTimeString() + ' — ' + msg;
+                logEl.prepend(p);
+                
+                // Limit log entries
+                if (logEl.children.length > 20) {
+                    logEl.removeChild(logEl.lastChild);
+                }
+            };
+            
+            // Event listeners
+            document.getElementById('reset').addEventListener('click', () => {
+                placements = {};
+                window.milestone50 = false;
+                window.milestone75 = false;
+                window.milestone100 = false;
+                buildGrid();
+                log('Grid reset - ready for new renewable energy design');
+                showToast('Grid reset successfully', 'success');
+            });
+            
+            document.getElementById('autoFill').addEventListener('click', () => {
+                // Clear existing placements
+                placements = {};
+                
+                // Strategic placement for demo: fill with optimal layout
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const key = r + "-" + c;
+                        const cell = cells[r * cols + c];
+
+                        if (cityCells.has(key)) {
+                            // Skip city cells
+                        } else if (c >= 7) {
+                            // Wind farms on the far right (away from cities)
+                            placements[key] = 'wind';
+                        } else if (shadeCells.has(key)) {
+                            // Fill natural shade with trees
+                            placements[key] = 'tree';
+                        } else {
+                            // Solar panels everywhere else
+                            placements[key] = 'solar';
+                        }
+                        
+                        if(placements[key]) {
+                            const type = placements[key];
+                            const icons = { solar: '☀️', wind: '🌬️', tree: '🌳', factory: '🏭' };
+                            cell.className = 'cell';
+                            if (cityCells.has(key)) cell.classList.add('city');
+                            if (shadeCells.has(key)) cell.classList.add('shade');
+                            cell.classList.add(type);
+                            cell.innerHTML = `<div style="pointer-events: none; font-size: 1.2em;">${icons[type]}</div>`;
+                        } else {
+                             // Clear non-city cell if no placement
+                            cell.className = 'cell';
+                            if (cityCells.has(key)) cell.classList.add('city');
+                            if (shadeCells.has(key)) cell.classList.add('shade');
+                            cell.innerHTML = cell.classList.contains('city') ? '🏙️' : (cell.classList.contains('shade') ? '🌳' : '');
+                        }
+                    }
+                }
+                
+                log('Demo layout applied - optimal renewable energy configuration');
+                recomputeEnergy();
+                showToast('Demo layout applied! See how renewable energy works.', 'success');
+            });
+
+            // Initialize the grid
+            buildGrid();
+            showToast('Welcome to Renewable Power Builder! Drag items to build your green city.', 'success');
+        };
+
+        // Add CSS for drag and drop visual feedback
+        const dragStyle = document.createElement('style');
+        dragStyle.textContent = `
+            .cell.over {
+                background: rgba(79, 172, 254, 0.3) !important;
+                transform: scale(1.05);
+                border: 2px solid #4facfe;
+            }
+            
+            .item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-2px);
+            }
+            
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .btn:hover:not(.tycoon-btn:disabled) { /* Adjusted selector for disabled buttons */
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+            
+            .power-builder-game .cell.solar { background: #ffd70030; border-color: #ffd700; }
+            .power-builder-game .cell.wind { background: #87ceeb30; border-color: #87ceeb; }
+            .power-builder-game .cell.factory { background: #77777730; border-color: #777; }
+            .power-builder-game .cell.tree { background: #56ab2f30; border-color: #56ab2f; }
+        `;
+        document.head.appendChild(dragStyle);
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+             // NOTE: The original code had the dashboard active by default, which is wrong for a login screen.
+             // The HTML was corrected to remove .active from #mainContent.
+             // If the user lands on the login page, give them the login toast.
+            if (document.getElementById('loginPage').classList.contains('active')) {
+                showToast('Welcome to Eco-Games Hub! Login to start your environmental gaming journey.', 'success');
+            }
+        });
+
+        // Add keyboard shortcuts for better UX
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('customModal').style.display === 'flex') {
+                    hideModal();
+                } else if (currentGame) {
+                    goBackToDashboard();
+                } 
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('customModal').addEventListener('click', (e) => {
+            if (e.target.id === 'customModal') {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>
